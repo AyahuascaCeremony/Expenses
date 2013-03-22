@@ -1,10 +1,13 @@
-<!DOCTYPE HTML>
-<html>
+<!doctype html>
+<html lang="en">
 	<head>
+		<meta charset="utf-8">
 		<title>Expenses</title>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script>
+		<script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js"></script>
 		<style type="text/css">
 			fieldset {
-				width: 200px
+				width: 220px
 			}
 			legend {
 				font-size: 20px
@@ -18,24 +21,28 @@
 			input {
 				width: 120px;
 			}
+			button {
+				width: 200px;
+			}
 		</style>
 	</head>
 	<body>
 	
-		<form method="post" action="/">
+		<form method="post" action="/" data-bind="submit: Save" id="expensesForm">
 			<fieldset>
 				<legend>Expense Details</legend>
 				
 				<label for="date">Date:</label>
-				<input type="date" name="date">
+				<input type="date" id="date" data-bind="value: Date">
 				
-				<label for="value">Value:</label>
-				<input type="number" name="value" min="0" step="0.01">
+				<label for="amount">Value:</label>
+				<input type="number" id="amount" min="0" step="0.01" data-bind="value: Amount">
 				
 				<label for="account">Account:</label>
-				<input list="Accounts" name="account">
+				<input list="Accounts" id="account" data-bind="value: Account">
 			
-				<input type="submit" value="Save">
+				<span data-bind="text: StatusMessage"></span>
+				<button type="submit">Save</button>
 			
 				<datalist id="Accounts">
 					<option value="Car">
@@ -50,4 +57,31 @@
 		</form>
 		
 	</body>
+	
+	<script type="text/javascript">
+	
+	var formViewModel = {
+		Save: function() {
+			this.StatusMessage("Saving...");
+			var saveSuccess = false;
+			
+			var data = ko.toJSON(this);
+			$.post("/Expense/Save.php", data, function(returnedData) {
+				saveSuccess = true;
+			});
+			
+			if (saveSuccess) {
+				this.StatusMessage("SAVED");
+			}
+			else {
+				this.StatusMessage("FAILED");
+			}
+    	},
+		Amount: ko.observable(0),
+		Date: ko.observable(null),
+		Account: ko.observable(""),
+		StatusMessage: ko.observable("New Expense")
+	};
+	ko.applyBindings(formViewModel, document.getElementById('expensesForm'));
+	</script>
 </html>
