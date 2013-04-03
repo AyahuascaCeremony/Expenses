@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Expenses</title>
+
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script>
+		<script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js"></script>
+		
+		<script type="text/javascript">
+		var viewModel = {
+			Name: "Rich",
+			Colour: "Blue",
+			Banana: {
+				X: "abc",
+				Y: "123"
+			}
+		};
+		function Go() {
+			
+			$.post("test.php", ko.toJS(viewModel), function(data) {
+				alert("1" + data);
+			});
+			$.post("test.php", $(viewModel).serialize(), function(data) {
+				alert("2" + data);
+			});
+		}
+		</script>
+		
+		<link rel="stylesheet" href="style.css">
+
+	</head>
+	<body>
+	<button onclick="javascript: Go()">Go</button>
+	</body>
+</html>

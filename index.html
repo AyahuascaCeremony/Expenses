@@ -3,43 +3,30 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Expenses</title>
+
 		<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js" ></script>
 		<script src="http://ajax.aspnetcdn.com/ajax/knockout/knockout-2.2.1.js"></script>
-		<style type="text/css">
-			fieldset {
-				width: 220px
-			}
-			legend {
-				font-size: 20px
-			}
-			label {
-				text-align: right;
-				width: 80px;
-				float: left;
-				font-weight: bold;
-			}
-			input {
-				width: 120px;
-			}
-			button {
-				width: 200px;
-			}
-		</style>
+		
+		<link rel="stylesheet" href="style.css">
+
 	</head>
 	<body>
 	
-		<form method="post" action="/" data-bind="submit: Save" id="expensesForm">
+		<form method="post" data-bind="submit: Save" id="expensesForm">
 			<fieldset>
 				<legend>Expense Details</legend>
 				
 				<label for="date">Date:</label>
-				<input type="date" id="date" data-bind="value: Date">
+				<input type="date" name="date" id="date" data-bind="value: Date">
 				
 				<label for="amount">Value:</label>
-				<input type="number" id="amount" min="0" step="0.01" data-bind="value: Amount">
+				<input type="number" name="amount" id="amount" min="0" step="0.01" data-bind="value: Amount">
+				
+				<label for="description">Description:</label>
+				<input type="text" name="description" id="description" data-bind="value: Description">
 				
 				<label for="account">Account:</label>
-				<input list="Accounts" id="account" data-bind="value: Account">
+				<input list="Accounts" name="account" id="account" data-bind="value: Account">
 			
 				<span data-bind="text: StatusMessage"></span>
 				<button type="submit">Save</button>
@@ -60,28 +47,19 @@
 	
 	<script type="text/javascript">
 	
-	var formViewModel = {
-		Save: function() {
-			this.StatusMessage("Saving...");
-			var saveSuccess = false;
-			
-			var data = ko.toJSON(this);
-			$.post("/Expense/Save.php", data, function(returnedData) {
-				saveSuccess = true;
+	var formViewModel = function () {
+		self = this;
+		self.Save = function() {
+			$.post("/Expense/Save.php", ko.toJSON(self), function(returnedData) {
+				self.StatusMessage(returnedData);
 			});
-			
-			if (saveSuccess) {
-				this.StatusMessage("SAVED");
-			}
-			else {
-				this.StatusMessage("FAILED");
-			}
-    	},
-		Amount: ko.observable(0),
-		Date: ko.observable(null),
-		Account: ko.observable(""),
-		StatusMessage: ko.observable("New Expense")
+    	};
+		self.Amount = ko.observable(0);
+		self.Date = ko.observable(null);
+		self.Account = ko.observable("");
+		self.Description = ko.observable("");
+		self.StatusMessage = ko.observable("New Expense");
 	};
-	ko.applyBindings(formViewModel, document.getElementById('expensesForm'));
+	ko.applyBindings(new formViewModel(), document.getElementById('expensesForm'));
 	</script>
 </html>
